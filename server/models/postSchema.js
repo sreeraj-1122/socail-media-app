@@ -6,7 +6,7 @@ const postSchema = new mongoose.Schema({
         type: String,
         required:true,
     },
-    image: {
+    filePath: {
         type: String
     },
     likes: {

@@ -5,7 +5,7 @@ import validator from 'validator'
 
 //login user
 
-const loginUser = async (req, res) => {
+const loginUser = async (req, res,next) => {
     const { email, password } = req.body
     try {  
         const user = await userModel.findOne({ email })
@@ -20,8 +20,7 @@ const loginUser = async (req, res) => {
         res.cookie('token', token, { httpOnly: true, secure: true}); // Set secure: true in production
         res.json({ success: true, token,message:"Login successfull" })
     } catch (error) {
-        console.log(error);
-        res.json({ success: false, message: "Error" })
+        next(error);
     }
 
 }
@@ -34,7 +33,7 @@ const createToken = (id) => {
 
 //register user
 
-const registerUser = async (req, res) => {
+const registerUser = async (req, res,next) => {
     const { name, email, password } = req.body
     try {
         const exists = await userModel.findOne({ email })
@@ -50,11 +49,8 @@ const registerUser = async (req, res) => {
             return res.json({ success: false, message: "Please enter a strong password" })
         }
 
-    
-
         const newUser = new userModel({
             name,
-            username,
             email,
             password,
         })
@@ -65,8 +61,7 @@ const registerUser = async (req, res) => {
         res.json({ success: true, token ,message:"register successfull"})
 
     } catch (error) {
-        console.log(error);
-        res.json({ success: false, message: "Error" })
+        next(error);
     }
 }
 export { loginUser, registerUser }

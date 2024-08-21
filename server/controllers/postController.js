@@ -1,6 +1,7 @@
 import comments from "../models/commentSchema.js";
 import User from "../models/userModel.js";
 import Posts from './../models/postSchema.js';
+
 //create post
 
 const createPost = async (req, res, next) => {
@@ -198,17 +199,17 @@ const likePost = async (req, res, next) => {
         const { id } = req.params
         const post = await Posts.findById(id)
         const index = post.likes.findeIndex((pid) => pid === String(userId));
-        if (index===-1) {
+        if (index === -1) {
             post.likes.push(userId)
-        }else{
-            post.likes=post.likes.filter((pid) => pid !== String(userId));
+        } else {
+            post.likes = post.likes.filter((pid) => pid !== String(userId));
 
         }
-        const newPost=await Posts.findByIdAndUpdate(id,post,{
-            new:true,
+        const newPost = await Posts.findByIdAndUpdate(id, post, {
+            new: true,
         })
 
-     
+
         res.status(200).json({
             success: true,
             message: "Successful",
@@ -220,5 +221,130 @@ const likePost = async (req, res, next) => {
     }
 
 }
+//like post comment
+const likePostComment = async (req, res, next) => {
 
-export { createPost, deletePost, editPost, getPosts, getUserPost, getComments, likePost }
+    try {
+        const { userId } = req.user
+        const { id, rid } = req.params
+
+        if (rid === undefined || rid === null || rid === `false`) {
+
+            const comment = await comments.findById(id)
+
+            const index = comment.likes.findeIndex((el) => el === String(userId));
+
+            if (index === -1) {
+                comment.likes.push(userId)
+            } else {
+                comment.likes = comment.likes.filter((i) => i !== String(userId));
+
+            }
+            const updated = await comments.findByIdAndUpdate(id, comment, {
+                new: true,
+            })
+
+            res.status(200).json({
+                success: true,
+                message: "updated",
+                data: newPost
+
+            })
+        } else {
+            const replyComments = await comments.findOne({ _id: id },
+                {
+                    replies: {
+                        $elementMatch: {
+                            _id: rid,
+
+                        },
+                    },
+                }
+            )
+            const index = replyComments?.replies[0]?.likes.findeIndex(
+                (i) => i === String(userId)
+
+            )
+            if (index === -1) {
+                replyComments.replies[0].likes.push(userId)
+            } else {
+                replyComments.replies[0].likes = replyComments.replies[0]?.likes.filter(
+                    (i) => i !== String(userId)
+                )
+
+            }
+            const query = { _id: id, "replies._id": id }
+            const updated = {
+                $set: {
+                    "replies.$.likes": replyComments.replies[0].likes,
+                }
+            }
+            const result = await comments.updateOne(query, updated, { new: true })
+            res.status(201).json({
+                result
+
+            })
+        }
+
+    } catch (error) {
+        next(error);
+    }
+
+}
+
+//commnetpost
+const replyPostComment = async (req, res, next) => {
+
+    try {
+        const { userId } = req.user
+        const { id } = req.params
+        const { comment,from ,replyAt} = req.body
+
+        if (comment===null) {
+          return  res.status(404).json({message: "comment is required" })
+        }
+        const commentInfo= await comments.findById(id)
+        commentInfo.push({
+            comment,
+            userId,
+            replyAt,
+            from,
+            created_At:Date.now(),
+        })
+        commentInfo.save()
+        res.status(200).json({message: commentInfo})
+    } catch (error) {
+        next(error);
+    }
+
+}
+//commnetpost
+const commentPost = async (req, res, next) => {
+
+    try {
+        const { userId } = req.user
+        const { id } = req.params
+        const { comment,from } = req.body
+
+        if (comment===null) {
+            res.status(404).json({message: "comment is required" })
+        }
+        const newComment= new comments({
+            comment,from,userId,postId:id
+        })
+        await newComment.save()
+
+        const post=await Posts.findById(id)
+        post.comments.push(newComment._id)
+        const updatedPost=await Posts.findByIdAndUpdate(id,post,{
+            new:true
+        })
+        
+    } catch (error) {
+        next(error);
+    }
+
+}
+
+
+export { createPost, deletePost, editPost, getPosts, getUserPost, getComments, likePost,likePostComment ,commentPost,replyPostComment}

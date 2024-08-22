@@ -6,6 +6,11 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    username: {
+        type: String,
+        required: true,
+        unique: true, // Ensure usernames are unique
+    }, 
     email: {
         type: String,
         required: true,
@@ -41,7 +46,7 @@ const userSchema = new mongoose.Schema({
 
 // Pre-save hook for password hashing (if needed)
 userSchema.pre('save', async function (next) {
-    if (this.isModified('password')) {
+    if (this.isModified('password')) { 
         // Hash the password before saving
         this.password = await bcrypt.hash(this.password, 10);
     }

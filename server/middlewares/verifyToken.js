@@ -1,19 +1,19 @@
-import jwt from 'jsonwebtoken'
-
+import jwt from 'jsonwebtoken';
 
 const verifyToken = (req, res, next) => {
-    const token = req.cookies.token;
-
+    const token = req.cookies?.token; // Safely access cookies
     if (!token) {
-        return res.status(403).send('Token is missing');
+        return res.status(403).json({ success: false, message: 'Token is missing' });
     }
 
     try {
-        const decoded = jwt.verify(token, secretKey);
-        req.user = decoded; // Add the decoded user information to request
+        const decoded = jwt.verify(token, process.env.JWT_SECRET); // Use environment variable for secret key
+        req.user = decoded; 
+        console.log(decoded);
         next();
     } catch (err) {
-        return res.status(401).send('Invalid token');
+        return res.status(401).json({ success: false, message: 'Invalid token' });
     }
 };
+
 export default verifyToken;

@@ -1,15 +1,20 @@
 import comments from "../models/commentSchema.js";
 import User from "../models/userModel.js";
 import Posts from './../models/postSchema.js';
-
+import fs from 'fs'
 //create post
 
 const createPost = async (req, res, next) => {
 
     try {
-        const { userId } = req.user
+        const { id: userId } = req.user;
         const { description } = req.body
-        const filePath = req.file.path;
+        let filePath;
+        if (req.file) {
+          filePath = req.file.path;
+        }
+
+
 
         if (!description) {
             return res.json({ success: false, message: "you must provide description" })
@@ -60,91 +65,97 @@ const deletePost = async (req, res, next) => {
 }
 //edit post
 const editPost = async (req, res, next) => {
-
     try {
-        const editPost = await Posts.findById(req.params.id);
-
-        if (!editPost) {
-            return res.status(404).json({ error: 'Post not found' });
+      // Find the post by ID
+      const editPost = await Posts.findById(req.params.id);
+  
+      if (!editPost) {
+        return res.status(404).json({ error: 'Post not found' });
+      }
+  
+      // Handle file replacement if a new file is uploaded
+      if (req.file) {
+        const oldFilePath = editPost.filePath; // Get the current file path from the post
+  
+        // Delete the old file if it exists
+        if (oldFilePath) {
+          fs.unlink(oldFilePath, (err) => {
+            if (err) {
+              console.error('Error deleting old file:', err);
+            }
+          });
         }
-
-        // Get the file path(s) associated with the post
-        // If a new file is uploaded, replace the old file
-        if (req.file) {
-            const oldFilePath = Posts.filePath;
-
-            // Delete the old file if it exists
-            fs.unlink(oldFilePath, (err) => {
-                if (err) {
-                    console.error('Error deleting old file:', err);
-                }
-            });
-
-        }
-        Posts.title = req.body.title || Posts.title;
-        Posts.description = req.body.description || Posts.description;
-
-        // Save the updated post
-        await Posts.save();
-        res.status(200).json({ message: 'Post updated successfully', Posts });
+  
+        // Set the new file path
+        editPost.filePath = req.file.path;
+      }
+  
+      // Update title and description if provided
+      editPost.title = req.body.title || editPost.title;
+      editPost.description = req.body.description || editPost.description;
+  
+      // Save the updated post
+      await editPost.save();
+  
+      res.status(200).json({ message: 'Post updated successfully', post: editPost });
     } catch (error) {
-
-        next(error);
+      next(error); // Handle errors
     }
-
-}
+  };
 
 //get posts
 const getPosts = async (req, res, next) => {
-
     try {
-        const { userId } = req.user
-        const { search } = req.body
-        const user = await User.findById(userId);
-        const following = user?.following?.toString().split(',') ?? [];
-        following.push(userId)
-
-        const searchPostQuery = {
-            $or: [
-                {
-                    description: { $regex: search, $options: "i" },
-                }
-            ],
-        }
-        const posts = await Posts.find(search ? searchPostQuery : {}).populate({
-            path: "userId",
-            select: "name location profile "
-        }).sort({ _id: -1 })
-
-        const friendPosts = posts?.filter((post) => {
-            return following.includes(post?.userId?._id.toString())
+      const { id: userId } = req.user;
+      const { search } = req.body;
+  
+      // Find the user by ID and get their following list
+      const user = await User.findById(userId);
+      const following = user?.following?.map(follow => follow.toString()) || [];
+      following.push(userId); // Include the user's own posts
+  
+      // Construct the search query
+      const searchPostQuery = search
+        ? { description: { $regex: search, $options: "i" } }
+        : {};
+  
+      // Find posts, with an optional search term
+      const posts = await Posts.find(searchPostQuery)
+        .populate({
+          path: "userId",
+          select: "name location profile",
         })
-        const otherPosts = posts?.filter((post) => following.includes(
-            post?.userId?._id.toString())
-        )
-
-        let postsRes = null;
-        if (friendPosts?.length > 0) {
-            postsRes = search ? friendPosts : [...friendPosts, ...otherPosts]
+        .sort({ _id: -1 });
+  
+      // Separate posts into friend posts and other posts
+      const friendPosts = [];
+      const otherPosts = [];
+  
+      posts.forEach(post => {
+        if (following.includes(post?.userId?._id.toString())) {
+          friendPosts.push(post);
         } else {
-            postsRes = posts
+          otherPosts.push(post);
         }
-        res.status(200).json({
-            success: true,
-            message: "Successful",
-            data: postsRes
-
-        })
+      });
+  
+      // Combine posts based on search status
+      const postsRes = search ? friendPosts : [...friendPosts, ...otherPosts];
+  
+      res.status(200).json({
+        success: true,
+        message: "Successful",
+        data: postsRes,
+      });
     } catch (error) {
-        next(error);
+      next(error);
     }
-
-}
+  };
+  
 const getUserPost = async (req, res, next) => {
 
     try {
-        const { userId } = req.user
-        const { search } = req.body
+        const { id: userId } = req.user;
 
         const post = await Posts.find({ userId }).populate({
             path: "userId",
@@ -168,9 +179,7 @@ const getUserPost = async (req, res, next) => {
 const getComments = async (req, res, next) => {
 
     try {
-        const { postId } = req.body
-
-
+        const { postId } = req.params
         const postComments = await comments.find({ postId }).populate({
             path: "userId",
             select: "name location profile "
@@ -193,153 +202,178 @@ const getComments = async (req, res, next) => {
 }
 //like post
 const likePost = async (req, res, next) => {
-
     try {
-        const { userId } = req.user
-        const { id } = req.params
-        const post = await Posts.findById(id)
-        const index = post.likes.findeIndex((pid) => pid === String(userId));
-        if (index === -1) {
-            post.likes.push(userId)
-        } else {
-            post.likes = post.likes.filter((pid) => pid !== String(userId));
-
-        }
-        const newPost = await Posts.findByIdAndUpdate(id, post, {
-            new: true,
-        })
-
-
-        res.status(200).json({
-            success: true,
-            message: "Successful",
-            data: newPost
-
-        })
+      const { id: userId } = req.user;
+      const { id } = req.params;
+  
+      // Find the post by ID
+      const post = await Posts.findById(id);
+  
+      if (!post) {
+        return res.status(404).json({ success: false, message: "Post not found" });
+      }
+  
+      // Ensure that the likes array is initialized
+      if (!post.likes) {
+        post.likes = [];
+      }
+  
+      // Check if the user has already liked the post
+      const hasLiked = post.likes.includes(String(userId));
+  
+      if (!hasLiked) {
+        // If not liked, add the user's ID to the likes array
+        post.likes.push(userId);
+      } else {
+        // If liked, remove the user's ID from the likes array
+        post.likes = post.likes.filter((pid) => pid !== String(userId));
+      }
+  
+      // Save the post with updated likes
+      const updatedPost = await post.save();
+  
+      res.status(200).json({
+        success: true,
+        message: "Post like status updated successfully",
+        data: updatedPost,
+      });
     } catch (error) {
-        next(error);
+      next(error);
     }
-
-}
+  };
+  
 //like post comment
 const likePostComment = async (req, res, next) => {
-
     try {
-        const { userId } = req.user
-        const { id, rid } = req.params
-
-        if (rid === undefined || rid === null || rid === `false`) {
-
-            const comment = await comments.findById(id)
-
-            const index = comment.likes.findeIndex((el) => el === String(userId));
-
-            if (index === -1) {
-                comment.likes.push(userId)
-            } else {
-                comment.likes = comment.likes.filter((i) => i !== String(userId));
-
-            }
-            const updated = await comments.findByIdAndUpdate(id, comment, {
-                new: true,
-            })
-
-            res.status(200).json({
-                success: true,
-                message: "updated",
-                data: newPost
-
-            })
-        } else {
-            const replyComments = await comments.findOne({ _id: id },
-                {
-                    replies: {
-                        $elementMatch: {
-                            _id: rid,
-
-                        },
-                    },
-                }
-            )
-            const index = replyComments?.replies[0]?.likes.findeIndex(
-                (i) => i === String(userId)
-
-            )
-            if (index === -1) {
-                replyComments.replies[0].likes.push(userId)
-            } else {
-                replyComments.replies[0].likes = replyComments.replies[0]?.likes.filter(
-                    (i) => i !== String(userId)
-                )
-
-            }
-            const query = { _id: id, "replies._id": id }
-            const updated = {
-                $set: {
-                    "replies.$.likes": replyComments.replies[0].likes,
-                }
-            }
-            const result = await comments.updateOne(query, updated, { new: true })
-            res.status(201).json({
-                result
-
-            })
+      const { id: userId } = req.user;
+      const { id, rid } = req.params;
+  
+      // Handle the case where `rid` is not provided (like/unlike a main comment)
+      if (!rid) {
+        const comment = await comments.findById(id);
+  
+        if (!comment) {
+          return res.status(404).json({ success: false, message: "Comment not found" });
         }
-
+  
+        // Toggle the like for the main comment
+        const hasLiked = comment.likes.includes(String(userId));
+  
+        if (!hasLiked) {
+          comment.likes.push(userId); // Like the comment
+        } else {
+          comment.likes = comment.likes.filter((i) => i !== String(userId)); // Unlike the comment
+        }
+  
+        // Save the updated comment
+        const updatedComment = await comment.save();
+  
+        return res.status(200).json({
+          success: true,
+          message: "Comment like status updated",
+          data: updatedComment,
+        });
+      }
+  
+      // Handle the case where `rid` is provided (like/unlike a reply)
+      const replyComment = await comments.findOne(
+        { _id: id, "replies._id": rid },
+        { "replies.$": 1 }
+      );
+  
+      if (!replyComment || !replyComment.replies.length) {
+        return res.status(404).json({ success: false, message: "Reply not found" });
+      }
+  
+      // Toggle the like for the reply
+      const reply = replyComment.replies[0];
+      const hasLiked = reply.likes.includes(String(userId));
+  
+      if (!hasLiked) {
+        reply.likes.push(userId); // Like the reply
+      } else {
+        reply.likes = reply.likes.filter((i) => i !== String(userId)); // Unlike the reply
+      }
+  
+      // Update the likes array for the specific reply
+      const result = await comments.updateOne(
+        { _id: id, "replies._id": rid },
+        { $set: { "replies.$.likes": reply.likes } }
+      );
+  
+      return res.status(200).json({
+        success: true,
+        message: "Reply like status updated",
+        result,
+      });
     } catch (error) {
-        next(error);
+      next(error);
     }
-
-}
+  };
+  
 
 //commnetpost
 const replyPostComment = async (req, res, next) => {
-
     try {
-        const { userId } = req.user
-        const { id } = req.params
-        const { comment,from ,replyAt} = req.body
-
-        if (comment===null) {
-          return  res.status(404).json({message: "comment is required" })
-        }
-        const commentInfo= await comments.findById(id)
-        commentInfo.push({
-            comment,
-            userId,
-            replyAt,
-            from,
-            created_At:Date.now(),
-        })
-        commentInfo.save()
-        res.status(200).json({message: commentInfo})
+      const { id: userId } = req.user;
+      const { id } = req.params;
+      const { comment, from, replyAt } = req.body;
+  
+      // Ensure the comment content is provided
+      if (!comment) {
+        return res.status(400).json({ message: "Comment is required" });
+      }
+  
+      // Find the original comment by ID
+      const commentInfo = await comments.findById(id);
+  
+      if (!commentInfo) {
+        return res.status(404).json({ message: "Comment not found" });
+      }
+  
+      // Push the reply to the replies array of the comment
+      commentInfo.replies.push({
+        comment,
+        userId,
+        from,
+        replyAt: replyAt || Date.now(), // Set replyAt to current time if not provided
+        created_At: Date.now(),
+      });
+  
+      // Save the updated comment with the new reply
+      await commentInfo.save();
+  
+      // Return the updated comment
+      res.status(200).json({ success: true, data: commentInfo });
     } catch (error) {
-        next(error);
+      next(error);
     }
-
-}
+  };
+  
 //commnetpost
 const commentPost = async (req, res, next) => {
 
     try {
-        const { userId } = req.user
+        const { id: userId } = req.user;
         const { id } = req.params
-        const { comment,from } = req.body
+        const { comment, from } = req.body
 
-        if (comment===null) {
-            res.status(404).json({message: "comment is required" })
+        if (comment === null) {
+            res.status(404).json({ message: "comment is required" })
         }
-        const newComment= new comments({
-            comment,from,userId,postId:id
+        const newComment = new comments({
+            comment, from, userId, postId: id
         })
         await newComment.save()
 
-        const post=await Posts.findById(id)
+        const post = await Posts.findById(id)
         post.comments.push(newComment._id)
-        const updatedPost=await Posts.findByIdAndUpdate(id,post,{
-            new:true
+        const updatedPost = await Posts.findByIdAndUpdate(id, post, {
+            new: true
         })
-        
+        res.status(200).json({ data: updatedPost })
+
+
     } catch (error) {
         next(error);
     }
@@ -347,4 +381,4 @@ const commentPost = async (req, res, next) => {
 }
 
 
-export { createPost, deletePost, editPost, getPosts, getUserPost, getComments, likePost,likePostComment ,commentPost,replyPostComment}
+export { createPost, deletePost, editPost, getPosts, getUserPost, getComments, likePost, likePostComment, commentPost, replyPostComment }

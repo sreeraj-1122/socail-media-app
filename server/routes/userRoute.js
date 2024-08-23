@@ -15,7 +15,7 @@ userRouter.post('/friendrequest',verifyToken,friendRequest)
 userRouter.post('/getfriendrequest',verifyToken,getFriendRequest)
 userRouter.post('/acceptrequest',verifyToken,acceptRequest)
 userRouter.post('/views',verifyToken,profileViews)
-userRouter.post('/sugestedfriend',verifyToken,suggestedFriends)
+userRouter.post('/suggestedfriend',verifyToken,suggestedFriends)
 
 
 export default userRouter

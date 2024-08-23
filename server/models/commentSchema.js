@@ -27,9 +27,9 @@ const commentSchema = new mongoose.Schema({
             created_At: { type: Date, default: Date.now() },
             updated_At: { type: Date, default: Date.now() },
 
-            likes: {
+            likes: [{
                 type: String,
-            },
+            }],
 
 
         }

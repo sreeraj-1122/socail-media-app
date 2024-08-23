@@ -9,9 +9,9 @@ const postSchema = new mongoose.Schema({
     filePath: {
         type: String
     },
-    likes: {
+    likes: [{
         type: String
-    },
+    }],
     comments: [{
         type: mongoose.Schema.Types.ObjectId, ref: 'Comments'
     }],

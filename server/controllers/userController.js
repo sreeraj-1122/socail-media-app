@@ -260,24 +260,28 @@ const profileViews = async (req, res, next) => {
         next(error);
     }
 }
-// profile views
+// suggestedFriends
 
 const suggestedFriends = async (req, res, next) => {
     try {
-        const { id: userId } = req.user;
-        let queryObject = {}
-        queryObject._id = { $ne: userId }
-        queryObject.following = { $nin: userId }
-        let queryResult = await User.find(queryObject).limits(15).select("name profile profession ")
-        const suggestedFriends = await queryResult
-
-        res.status(201).json({ success: true, data: suggestedFriends, })
-
-
+      const { id: userId } = req.user;
+  
+      // Construct query to find users the current user is not following
+      const suggestedFriends = await User.find({
+        _id: { $ne: userId },                // Exclude current user
+        following: { $nin: [userId] }         // Users not being followed by current user
+      })
+        .limit(15)
+        .select("name profile profession");
+  
+      // Send the response
+      res.status(200).json({ success: true, data: suggestedFriends });
+      
     } catch (error) {
-        next(error);
+      next(error);
     }
-}
+  };
+  
 
 
 export { loginUser, registerUser, getUser, updateUser, friendRequest, getFriendRequest, acceptRequest, profileViews, suggestedFriends }

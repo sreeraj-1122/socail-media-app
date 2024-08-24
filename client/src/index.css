@@ -5,11 +5,22 @@
 @tailwind utilities;
 
 
-*{
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     font-family: "Roboto", sans-serif;
     scroll-behavior: smooth;
 
+}
+
+body {
+    background-color: #ffffff;
+    color: #121212;
+}
+
+/* Dark mode styles */
+body.dark {
+    background-color: #000;
+    color: #ffffff;
 }

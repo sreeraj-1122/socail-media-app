@@ -1,9 +1,24 @@
-import React from 'react'
+import React from "react";
+import { Navigate, Outlet } from "react-router-dom";
+import { useStore } from "../../context/StoreContextProvider";
+import Navbar from "../../components/navbar/Navbar";
 
 const Layout = () => {
-  return (
-    <div>Layout</div>
-  )
-}
+  const { isAuthenticated } = useStore();
+  console.log("layout", isAuthenticated);
+  if (!isAuthenticated) {
+    return <Navigate to="/auth" />;
+  }
 
-export default Layout
+  return (
+    <>
+        <Navbar/>
+      <main>
+        <Outlet />
+      </main>
+      {/* <footer>Your Footer</footer> */}
+    </>
+  );
+};
+
+export default Layout;

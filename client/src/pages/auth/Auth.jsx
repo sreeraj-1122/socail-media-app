@@ -2,16 +2,27 @@ import React, { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import connect from "../../assets/images/connect.jpg";
+import axios from "axios";
+import { baseUrl } from "./../../baseUrl/baseUrl";
+import Cookies from "js-cookie";
+import { toast } from 'react-toastify';
+import ClipLoader from "react-spinners/ClipLoader"; // Import spinner component
+import { useNavigate } from "react-router-dom";
+import { useStore } from "../../context/StoreContextProvider";
 
 // Function to dynamically create validation schema based on the login state
 const getValidationSchema = (login) => {
   return Yup.object({
-    name: login === "Sign up" 
-      ? Yup.string().required("Full name is required") 
-      : Yup.string(),
-    username: login === "Sign up"
-      ? Yup.string().required("Username is required").min(5, "Username must be at least 5 characters")
-      : Yup.string(),
+    name:
+      login === "Sign up"
+        ? Yup.string().required("Full name is required")
+        : Yup.string(),
+    username:
+      login === "Sign up"
+        ? Yup.string()
+            .required("Username is required")
+            .min(5, "Username must be at least 5 characters")
+        : Yup.string(),
     email: Yup.string()
       .email("Invalid email address")
       .required("Email is required"),
@@ -23,9 +34,33 @@ const getValidationSchema = (login) => {
 
 const Auth = () => {
   const [login, setLogin] = useState("Login");
-
-  const handleSubmit = (values) => {
-    console.log("Form data:", values);
+  const { setIsAuthenticated } = useStore();
+  const navigate=useNavigate()
+  const handleSubmit = async (values, { resetForm }) => {
+    try {
+      let path;
+      if (login === "Login") {
+        path = `${baseUrl}/user/login`;
+      } else {
+        path = `${baseUrl}/user/register`;
+      }
+      const response = await axios.post(path, values);
+      if (response.data.success) {
+        Cookies.set("authToken", response.data.token, { expires: 7 });
+        setIsAuthenticated(true);
+        toast.success(response.data.message);
+        navigate('/');
+        resetForm(); // Reset form after successful submission
+      } else {  
+        toast.error(response.data.message);
+      }
+    } catch (error) {
+      if (error.response) {
+        toast.error(error.response.data.message || "Something went wrong");
+      } else {
+        toast.error("Network error or server is down");
+      }
+    }
   };
 
   const initialValues = {
@@ -36,22 +71,22 @@ const Auth = () => {
   };
 
   return (
-    <div className="w-full h-screen flex bg-white">
+    <div className="w-full h-screen flex flex-col sm:flex-row  bg-white">
       {/* Section for branding or additional information */}
       <section className="flex-1 grid place-content-center p-8">
-        <h1 className="text-6xl font-bold text-blue-600 mb-4 ms-14">
+        <h1 className="text-6xl font-bold text-blue-600 mb-4 sm:ms-14">
           InstaStream
         </h1>
-        <p className="text-xl text-gray-600 font-semibold ms-14">
+        <p className="text-xl text-gray-600 font-semibold sm:ms-14">
           Connect with friends and the world around you on Instastream
         </p>
         <img src={connect} alt="" className="w-[90%] h-auto m-auto" />
       </section>
 
       {/* Section for the authentication form */}
-      <section className="flex-1 grid place-content-center p-8">
-        <div className="bg-white p-8 rounded shadow-2xl w-[27rem]">
-          <h1 className="text-center text-5xl font-medium font-[Italianno] mb-1">
+      <section className="flex-1 grid place-content-center p-3">
+        <div className="bg-white p-7 rounded shadow-2xl w-[22rem] sm:w-[27rem]">
+          <h1 className="text-center text-5xl font-medium font-[Italianno] sm:mb-1 my-3">
             {login}
           </h1>
           <Formik
@@ -60,15 +95,12 @@ const Auth = () => {
             onSubmit={handleSubmit}
             enableReinitialize={true} // Ensure Formik reinitializes when mode changes
           >
-            {({ isSubmitting }) => (
+            {({ isSubmitting, resetForm }) => (
               <Form>
                 {login === "Sign up" && (
                   <>
-                    <div className="mb-4">
-                      <label
-                        htmlFor="username"
-                        className="block text-gray-700 font-medium"
-                      >
+                    <div className="mb-4 ">
+                      <label htmlFor="username" className=" text-gray-700 font-medium">
                         Username
                       </label>
                       <Field
@@ -83,10 +115,7 @@ const Auth = () => {
                       />
                     </div>
                     <div className="mb-4">
-                      <label
-                        htmlFor="name"
-                        className="block text-gray-700 font-medium"
-                      >
+                      <label htmlFor="name" className=" text-gray-700 font-medium">
                         Full Name
                       </label>
                       <Field
@@ -103,10 +132,7 @@ const Auth = () => {
                   </>
                 )}
                 <div className="mb-4">
-                  <label
-                    htmlFor="email"
-                    className="block text-gray-700 font-medium"
-                  >
+                  <label htmlFor="email" className=" text-gray-700 font-medium">
                     Email
                   </label>
                   <Field
@@ -122,10 +148,7 @@ const Auth = () => {
                 </div>
 
                 <div className="mb-4">
-                  <label
-                    htmlFor="password"
-                    className="block text-gray-700 font-medium"
-                  >
+                  <label htmlFor="password" className=" text-gray-700 font-medium">
                     Password
                   </label>
                   <Field
@@ -143,9 +166,16 @@ const Auth = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-blue-600 text-white p-2 h-12 rounded hover:bg-blue-700"
+                  className="w-full bg-blue-600 text-white p-2 h-12 rounded hover:bg-blue-700 relative"
                 >
-                  {login}
+                  {isSubmitting ? (
+                    <div className="flex justify-center items-center gap-4">
+                      <span className="ml-2">Submitting...</span>
+                      <ClipLoader color="#ffffff" size={20} /> {/* Spinner */}
+                    </div>
+                  ) : (
+                    login
+                  )}
                 </button>
               </Form>
             )}

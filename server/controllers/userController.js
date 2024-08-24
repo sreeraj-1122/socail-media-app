@@ -19,7 +19,7 @@ const loginUser = async (req, res, next) => {
         }
         const token = createToken(user._id);
         res.cookie('token', token, { httpOnly: true, secure: true }); // Set secure: true in production
-        res.json({ success: true, token, message: "Login successfull", data: user })
+        res.json({ success: true, token, message: "Login successful", data: user })
     } catch (error) {
         next(error);
     }

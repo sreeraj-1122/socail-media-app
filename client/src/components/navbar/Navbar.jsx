@@ -14,18 +14,18 @@ const Navbar = () => {
       {/* Desktop Navbar */}
       <div className="hidden md:flex justify-between items-center px-8 py-3">
         {/* Logo */}
-        <div className="text-3xl font-bold text-blue-600 cursor-pointer">
+        <div className="text-3xl font-bold text-blue-500 cursor-pointer ">
           Insta<span className="text-orange-600">Stream</span>
         </div>
 
         {/* Search Bar */}
-        <div className="flex items-center w-1/3 dark:border-gray-500 rounded-md border border-gray-300 shadow">
+        <div className="flex items-center w-1/3 dark:border-gray-500 rounded-full border border-gray-300 shadow dark:bg-[#212b36]">
           <input
             type="text"
             placeholder="Search..."
-            className="ps-2 py-2 border-none outline-none w-full dark:text-white dark:bg-[#212b36] rounded-s-md"
+            className="ps-4 py-3 border-none outline-none w-full dark:text-white dark:bg-[#212b36] rounded-s-full h-full"
           />
-          <span className="bg-blue-800 h-full py-3 px-5 text-white rounded-e-md cursor-pointer shadow">
+          <span className="bg-blue-800 h-full py-3 px-5 text-white rounded-e-full cursor-pointer shadow dark:border-gray-500  border border-gray-300 ">
             <GoSearch className="text-xl font-bold" />
           </span>
         </div>
@@ -47,7 +47,7 @@ const Navbar = () => {
           </span>
 
           {/* Logout Button */}
-          <button className="border-red-400 border rounded-md inline-flex items-center justify-center py-2 px-3 text-center text-base font-medium hover:bg-[#d63d0f] text-white flext gap-2 bg-orange-600">
+          <button className="border-red-400 border rounded-full inline-flex items-center justify-center py-2 px-3 text-center text-base font-medium hover:bg-[#d63d0f] text-white flext gap-2 bg-orange-600 shadow-md">
             Logout
             <RiLogoutBoxRLine />
           </button>
@@ -60,21 +60,24 @@ const Navbar = () => {
         <div className="text-2xl font-bold text-blue-600 cursor-pointer">
           Insta<span className="text-orange-600">Stream</span>
         </div>
-        <div className="flex items-center w-[40%] dark:border-gray-500 rounded-md border border-gray-300 shadow ">
+        <div className="flex items-center w-[40%] dark:border-gray-500 rounded-full border border-gray-300 shadow dark:bg-[#212b36]">
           <input
             type="text"
             placeholder="Search..."
-            className="ps-2 py-1 border-none outline-none w-full dark:text-white dark:bg-[#212b36] rounded-s-md"
+            className="ps-2 py-1 border-none outline-none w-full dark:text-white dark:bg-[#212b36] rounded-s-full"
           />
-          <span className="bg-blue-800 h-full py-2 px-3 text-white rounded-e-md cursor-pointer shadow">
+          <span className="bg-blue-800 h-full py-2 px-3 text-white rounded-e-full cursor-pointer shadow  dark:border-gray-500  border border-gray-300">
             <GoSearch className="text-xl font-bold" />
           </span>
         </div>
 
         {/* Theme Switcher */}
-        <span onClick={() => setIsDarkMode(!isDarkMode)}>
+        <span
+          onClick={() => setIsDarkMode(!isDarkMode)}
+          className="transition-all duration-600 ease-in-out transform hover:scale-110"
+        >
           {isDarkMode ? (
-            <MdOutlineLightMode className="text-2xl" />
+            <MdOutlineLightMode className="text-2xl " />
           ) : (
             <MdOutlineDarkMode className="text-2xl" />
           )}

@@ -75,7 +75,7 @@ const Auth = () => {
       {/* Section for branding or additional information */}
       <section className="flex-1 grid place-content-center p-8">
         <h1 className="text-6xl font-bold text-blue-600 mb-4 sm:ms-14">
-          InstaStream
+          Insta<span className="text-orange-600">Stream</span>
         </h1>
         <p className="text-xl text-gray-600 font-semibold sm:ms-14">
           Connect with friends and the world around you on Instastream

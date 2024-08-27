@@ -22,8 +22,8 @@ export default {
         'custom-light': '#93C5FD',
       },
       boxShadow: {
-        'custom': '0px 0px 20px rgba(0, 0, 0, 0.055)',
-        'custom-dark': '0 8px 30px rgba(0, 0, 0, 0.5)',
+        'custom': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+        'custom-dark': '0 0 8px rgba(0, 0, 0, 0.4)',
       },
     },
   },

@@ -4,8 +4,8 @@ import Friends from "../../components/friends/Friends";
 
 const Home = () => {
   return (
-    <div className=" grid grid-cols-[1fr_2fr_1fr] gap-3 w-full h-screen p-3">
-      <aside className="bg-red-700">
+    <div className=" grid grid-cols-[1fr_2fr_1fr] gap-3 w-full h-screen p-3 pt-4">
+      <aside className="rounded-lg">
         <Profile />
         <Friends/>
       </aside>

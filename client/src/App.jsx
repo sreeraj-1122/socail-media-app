@@ -5,6 +5,7 @@ import { ToastContainer, Bounce } from "react-toastify";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Layout from "./pages/Layout/Layout";
 import Home from "./pages/home/Home";
+import Profile from "./components/profile/Profile";
 
 const App = () => {
   return (
@@ -28,6 +29,9 @@ const App = () => {
             <Route path="/auth" element={<Auth />} />
             <Route path="/" element={<Layout />}>
               <Route index element={<Home />} />
+              <Route path='/profile' element={<Profile />} />
+              <Route path='/profile' element={<Profile />} />
+              <Route path='/profile' element={<Profile />} />
             </Route>
           </Routes>
         </div>

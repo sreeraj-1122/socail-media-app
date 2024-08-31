@@ -4,15 +4,16 @@ import { FaRegBell, FaBars, FaTimes } from "react-icons/fa";
 import { MdOutlineLightMode, MdOutlineDarkMode } from "react-icons/md";
 import { useStore } from "../../context/StoreContextProvider";
 import { RiHomeLine, RiLogoutBoxRLine, RiUserLine } from "react-icons/ri";
+import { NavLink } from "react-router-dom";
 
 const Navbar = () => {
   const { isDarkMode, setIsDarkMode } = useStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <nav className="shadow-lg dark:bg-custom-bg ">
+    <nav className="sticky top-0 shadow-lg dark:bg-custom-bg z-50">
       {/* Desktop Navbar */}
-      <div className="hidden md:flex justify-between items-center px-8 py-3">
+      <div className="hidden md:flex justify-between items-center px-8 py-3 bg-white dark:bg-custom-bg">
         {/* Logo */}
         <div className="text-3xl font-bold text-blue-500 cursor-pointer ">
           Insta<span className="text-orange-600">Stream</span>
@@ -55,7 +56,7 @@ const Navbar = () => {
       </div>
 
       {/* Mobile Navbar */}
-      <div className="flex md:hidden justify-between items-center px-3 gap-3 py-3 ">
+      <div className="flex md:hidden justify-between items-center px-3 gap-3 py-3 bg-white dark:bg-custom-bg">
         {/* Logo */}
         <div className="text-2xl font-bold text-blue-600 cursor-pointer">
           Insta<span className="text-orange-600">Stream</span>
@@ -99,14 +100,30 @@ const Navbar = () => {
         }`}
       >
         <ul className="flex flex-col items-center gap-2 pt-3">
-          <li className=" items-center justify-center text-center text-base font-medium hover:text-white flex gap-2 hover:bg-slate-700 w-full py-2">
-            Home
-            <RiHomeLine /> {/* Replace with appropriate icon */}
-          </li>
-          <li className=" items-center justify-center text-center text-base font-medium hover:text-white flex gap-2 hover:bg-slate-600 w-full py-2">
-            Profile
-            <RiUserLine /> {/* Replace with appropriate icon */}
-          </li>
+          <NavLink to="/">
+            <li className=" items-center justify-center text-center text-base font-medium hover:text-white flex gap-2 hover:bg-slate-700 w-full py-2">
+              Home
+              <RiHomeLine />
+            </li>
+          </NavLink>
+          <NavLink to="/profile">
+            <li className=" items-center justify-center text-center text-base font-medium hover:text-white flex gap-2 hover:bg-slate-600 w-full py-2">
+              Profile
+              <RiUserLine />
+            </li>
+          </NavLink>
+          <NavLink to="/profile">
+            <li className=" items-center justify-center text-center text-base font-medium hover:text-white flex gap-2 hover:bg-slate-600 w-full py-2">
+              Profile
+              <RiUserLine />
+            </li>
+          </NavLink>
+          <NavLink to="/profile">
+            <li className=" items-center justify-center text-center text-base font-medium hover:text-white flex gap-2 hover:bg-slate-600 w-full py-2">
+              Profile
+              <RiUserLine />
+            </li>
+          </NavLink>
           <li className=" items-center justify-center text-center text-base font-medium hover:text-white flex gap-2 hover:bg-slate-600 w-full py-2">
             Logout
             <RiLogoutBoxRLine />

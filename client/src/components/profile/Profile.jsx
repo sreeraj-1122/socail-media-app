@@ -4,8 +4,11 @@ import { FaEdit } from "react-icons/fa";
 import { FaLocationDot } from "react-icons/fa6";
 import { MdOutlineEmail } from "react-icons/md";
 import { FaInstagram, FaGithub, FaFacebook } from "react-icons/fa6";
+import { useStore } from "../../context/StoreContextProvider";
 
 const Profile = () => {
+  const {  profile,setProfile } = useStore();
+
   return (
     <div className="shadow-custom-dark dark:bg-custom-bg w-full p-4 rounded-lg mb-4">
       <section className="flex items-center gap-3 mb-4">
@@ -16,7 +19,7 @@ const Profile = () => {
           <h1 className="text-lg font-semibold">Sreeraj</h1>
           <p className="text-sm text-gray-600 dark:text-gray-300 opacity-80">No profession</p>
         </div>
-        <button aria-label="Edit Profile">
+        <button aria-label="Edit Profile" onClick={()=>setProfile(true)}>
           <FaEdit className="text-gray-400 hover:text-blue-500" />
         </button>
       </section>

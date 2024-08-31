@@ -14,6 +14,9 @@ const Home = () => {
       <main className="">
         <CreatePost />
         <Post />
+        <Post />
+        <Post />
+        <Post />
       </main>
       <aside className="  ">
         <Friends heading="Friend Request" />

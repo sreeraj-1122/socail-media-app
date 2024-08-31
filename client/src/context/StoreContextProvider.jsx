@@ -6,6 +6,7 @@ export const StoreContext = createContext(null);
 export const useStore = () => useContext(StoreContext);
 
 const StoreContextProvider = ({ children }) => {
+  const [profile,setProfile]=useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(
     Cookies.get("authToken")
   ); // Boolean value
@@ -36,6 +37,7 @@ const StoreContextProvider = ({ children }) => {
     setIsAuthenticated,
     isDarkMode,
     setIsDarkMode,
+    profile,setProfile
   };
 
   return (

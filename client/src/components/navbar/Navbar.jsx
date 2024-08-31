@@ -10,7 +10,7 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <nav className="shadow-lg dark:bg-custom-bg">
+    <nav className="shadow-lg dark:bg-custom-bg ">
       {/* Desktop Navbar */}
       <div className="hidden md:flex justify-between items-center px-8 py-3">
         {/* Logo */}
@@ -19,7 +19,7 @@ const Navbar = () => {
         </div>
 
         {/* Search Bar */}
-        <div className="flex items-center w-1/3 dark:border-gray-500 rounded-full border border-gray-300 shadow dark:bg-[#212b36]">
+        <div className="flex items-center w-[40%] dark:border-gray-500 rounded-full border border-gray-300 shadow dark:bg-[#212b36]">
           <input
             type="text"
             placeholder="Search..."

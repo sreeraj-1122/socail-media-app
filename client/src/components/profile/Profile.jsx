@@ -7,7 +7,7 @@ import { FaInstagram, FaGithub, FaFacebook } from "react-icons/fa6";
 
 const Profile = () => {
   return (
-    <div className="shadow-custom-dark dark:bg-custom-bg w-full p-4 rounded-lg">
+    <div className="shadow-custom-dark dark:bg-custom-bg w-full p-4 rounded-lg mb-4">
       <section className="flex items-center gap-3 mb-4">
         <div>
           <img src={person} alt="Profile" className="w-12 h-12 rounded-full" />
@@ -39,7 +39,7 @@ const Profile = () => {
       <section className="mb-4">
         <h1 className="font-semibold">2 Friends</h1>
         <div className="mt-3 text-sm flex justify-between">
-          <p className="text-gray-600 dark:text-gray-300 opacity-80">Who viewed your profile</p>
+          <p className="text-gray-600 dark:text-gray-300 opacity-80 ">Who viewed your profile</p>
           <span className="opacity-90">0</span>
         </div>
         <div className="mt-3 flex justify-between text-sm">

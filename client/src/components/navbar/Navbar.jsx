@@ -11,7 +11,7 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <nav className="sticky top-0 shadow-lg dark:bg-custom-bg z-50">
+    <nav className="sticky top-0 shadow-lg dark:bg-custom-bg z-40 md:mb-4 mb-2 ">
       {/* Desktop Navbar */}
       <div className="hidden md:flex justify-between items-center px-8 py-3 bg-white dark:bg-custom-bg">
         {/* Logo */}
@@ -56,7 +56,7 @@ const Navbar = () => {
       </div>
 
       {/* Mobile Navbar */}
-      <div className="flex md:hidden justify-between items-center px-3 gap-3 py-3 bg-white dark:bg-custom-bg">
+      <div className="flex md:hidden justify-between items-center px-3 gap-3 py-3 bg-white dark:bg-custom-bg mb-2">
         {/* Logo */}
         <div className="text-2xl font-bold text-blue-600 cursor-pointer">
           Insta<span className="text-orange-600">Stream</span>
@@ -95,32 +95,38 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       <div
-        className={`fixed top-16 right-0 h-full w-[40%]  bg-[#e9e9e9] dark:bg-[#121212] shadow-md transform transition-transform duration-300 ease-in-out ${
+        className={`fixed top-16 right-0 h-full w-[60%]  bg-[#e9e9e9] dark:bg-[#121212] shadow-md transform transition-transform duration-300 ease-in-out ${
           isMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        <ul className="flex flex-col items-center gap-2 pt-3">
-          <NavLink to="/">
+        <ul className="flex flex-col items-center gap-2 pt-3 ">
+          <NavLink to="/" activeClassName="bg-slate-600 text-white" className="w-full">
             <li className=" items-center justify-center text-center text-base font-medium hover:text-white flex gap-2 hover:bg-slate-700 w-full py-2">
               Home
               <RiHomeLine />
             </li>
           </NavLink>
-          <NavLink to="/profile">
+          <NavLink to="/profile" className="w-full">
             <li className=" items-center justify-center text-center text-base font-medium hover:text-white flex gap-2 hover:bg-slate-600 w-full py-2">
               Profile
               <RiUserLine />
             </li>
           </NavLink>
-          <NavLink to="/profile">
+          <NavLink to="/friends" className="w-full">
             <li className=" items-center justify-center text-center text-base font-medium hover:text-white flex gap-2 hover:bg-slate-600 w-full py-2">
-              Profile
+              Friends
               <RiUserLine />
             </li>
           </NavLink>
-          <NavLink to="/profile">
+          <NavLink to="/friendreq" className="w-full">
             <li className=" items-center justify-center text-center text-base font-medium hover:text-white flex gap-2 hover:bg-slate-600 w-full py-2">
-              Profile
+            Friend Request
+              <RiUserLine />
+            </li>
+          </NavLink>
+          <NavLink to="/friendssuggest" className="w-full">
+            <li className=" items-center justify-center text-center text-base font-medium hover:text-white flex gap-2 hover:bg-slate-600 w-full py-2">
+            Friend Suggestion
               <RiUserLine />
             </li>
           </NavLink>

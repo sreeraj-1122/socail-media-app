@@ -24,3 +24,29 @@ body.dark {
     background-color: #000;
     color: #ffffff;
 }
+::-webkit-scrollbar {
+    width: 6px;  /* Adjust width for vertical scrollbars */
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Track color */
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888; /* Handle color */
+    border-radius: 10px; /* Rounded corners */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Handle color on hover */
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 0;  /* Hide scrollbar width */
+    height: 0; /* Hide scrollbar height */
+}
+
+.custom-scrollbar {
+    -ms-overflow-style: none; /* Hide scrollbar for IE and Edge */
+    scrollbar-width: none; /* Hide scrollbar for Firefox */
+}

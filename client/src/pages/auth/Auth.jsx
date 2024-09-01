@@ -46,7 +46,7 @@ const Auth = () => {
       }
       const response = await axios.post(path, values);
       if (response.data.success) {
-        Cookies.set("authToken", response.data.token, { expires: 7 });
+        Cookies.set("token", response.data.token, { expires: 7 });
         setIsAuthenticated(true);
         toast.success(response.data.message);
         navigate('/');

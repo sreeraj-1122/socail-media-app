@@ -31,6 +31,15 @@ const userSchema = new mongoose.Schema({
     profession: {
         type: String
     },
+    instagram: {
+        type: String
+    },
+    facebook: {
+        type: String
+    },
+    github: {
+        type: String
+    },
     views: [{
         type: String
     }],

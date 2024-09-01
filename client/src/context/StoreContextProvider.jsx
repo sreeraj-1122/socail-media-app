@@ -6,14 +6,14 @@ export const StoreContext = createContext(null);
 export const useStore = () => useContext(StoreContext);
 
 const StoreContextProvider = ({ children }) => {
-  const [profile,setProfile]=useState(false)
+  const [isOpen, setIsOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(
-    Cookies.get("authToken")
+    Cookies.get("token")
   ); // Boolean value
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
-    const token = Cookies.get("authToken");
+    const token = Cookies.get("token");
     if (token) {
       setIsAuthenticated(true);
     } else {
@@ -37,7 +37,7 @@ const StoreContextProvider = ({ children }) => {
     setIsAuthenticated,
     isDarkMode,
     setIsDarkMode,
-    profile,setProfile
+    isOpen, setIsOpen
   };
 
   return (

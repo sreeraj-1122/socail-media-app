@@ -5,7 +5,7 @@ import Navbar from "../../components/navbar/Navbar";
 import EditProfile from "../../components/Edit profile/EditProfile";
 
 const Layout = () => {
-  const { isAuthenticated, profile } = useStore();
+  const { isAuthenticated, isOpen } = useStore();
   console.log("layout", isAuthenticated);
   if (!isAuthenticated) {
     return <Navigate to="/auth" />;
@@ -13,7 +13,7 @@ const Layout = () => {
 
   return (
     <>
-      {profile && <EditProfile />}
+      {isOpen && <EditProfile />}
       <Navbar />
       <main>
         <Outlet />

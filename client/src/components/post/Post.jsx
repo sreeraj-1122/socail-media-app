@@ -19,7 +19,7 @@ const Post = () => {
   };
 
   return (
-    <div className="shadow-custom-dark dark:bg-custom-bg w-full p-4 rounded-lg mb-4">
+    <div className="shadow-custom-dark dark:bg-custom-bg w-full p-4 rounded-lg mb-3">
       {/* Post Header */}
       <div className="flex items-center gap-2 mb-2 ">
         <img

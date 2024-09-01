@@ -18,7 +18,7 @@ const CreatePost = () => {
   };
 
   return (
-    <div className="shadow-custom-dark dark:bg-custom-bg w-full p-4 rounded-lg mb-4">
+    <div className="shadow-custom-dark dark:bg-custom-bg w-full p-4 rounded-lg mb-3 ">
       <form action="" className="">
         <div className="flex mb-5 gap-2 items-center">
           <img src={person} alt="Profile" className="w-10 h-10 rounded-full" />

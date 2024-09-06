@@ -5,6 +5,7 @@ import { FaVideo } from "react-icons/fa";
 import { BiSolidFileGif } from "react-icons/bi";
 import axios from "axios";
 import { baseUrl } from "../../baseUrl/baseUrl";
+import { toast } from 'react-toastify';
 
 const CreatePost = () => {
   const fileInputRef = useRef(null);
@@ -46,8 +47,11 @@ const CreatePost = () => {
         withCredentials: true,
       });
       console.log(response.data);
+      toast.success(response.data.message);
+      
     } catch (error) {
       console.error("Error creating post:", error);
+      
     }
   };
 

@@ -100,7 +100,7 @@ const Navbar = () => {
         }`}
       >
         <ul className="flex flex-col items-center gap-2 pt-3 ">
-          <NavLink to="/" activeClassName="bg-slate-600 text-white" className="w-full">
+          <NavLink to="/"   className="w-full">
             <li className=" items-center justify-center text-center text-base font-medium hover:text-white flex gap-2 hover:bg-slate-700 w-full py-2">
               Home
               <RiHomeLine />

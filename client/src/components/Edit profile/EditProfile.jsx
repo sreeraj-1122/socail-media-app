@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useStore } from "../../context/StoreContextProvider";
+import { baseUrl } from "../../baseUrl/baseUrl";
+import axios from 'axios'; // Import axios
+import { toast } from "react-toastify";
 
 const EditProfile = () => {
-  const { isOpen, setIsOpen } = useStore();
-
+  const { isOpen, setIsOpen, profileId } = useStore();
   const [formData, setFormData] = useState({
     name: "",
     username: "",
@@ -12,8 +14,23 @@ const EditProfile = () => {
     instagram: "",
     facebook: "",
     github: "",
-    profile: null, // Initialize profile with null for file input
+    profile: null,
   });
+
+  useEffect(() => {
+    if (profileId) {
+      setFormData({
+        name: profileId.name || "",
+        username: profileId.username || "",
+        location: profileId.location || "",
+        profession: profileId.profession || "",
+        instagram: profileId.instagram || "",
+        facebook: profileId.facebook || "",
+        github: profileId.github || "",
+        profile: null, // Initialize with existing profile image if available
+      });
+    }
+  }, [profileId]);
 
   const toggleModal = () => {
     setIsOpen(!isOpen);
@@ -27,11 +44,54 @@ const EditProfile = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData); // Replace this with actual form submission logic
+  
+    // File type validation for profile image
+    if (formData.profile && !formData.profile.type.startsWith("image/")) {
+      return toast.error("Please upload a valid image file.");
+    }
+  
+    // Validate username length
+    if (formData.username.length < 5) {
+      return toast.error("Username must be at least 5 characters long.");
+    }
+  
+    // URL validation
+    const urlPattern = /^(https?:\/\/)?(www\.)?([\w\d-]+\.[a-z]{2,})([\/\w\d-]*)*\/?$/i;
+    if (formData.instagram && !urlPattern.test(formData.instagram)) {
+      return toast.error("Instagram link must be a valid URL.");
+    }
+    if (formData.facebook && !urlPattern.test(formData.facebook)) {
+      return toast.error("Facebook link must be a valid URL.");
+    }
+    if (formData.github && !urlPattern.test(formData.github)) {
+      return toast.error("GitHub link must be a valid URL.");
+    }
+  
+    const form = new FormData();
+    Object.keys(formData).forEach(key => {
+      if (formData[key]) {
+        form.append(key, formData[key]);
+      }
+    });
+  
+    try {
+      const response = await axios.put(
+        `${baseUrl}/user/updateuser`,
+        form,
+        { headers: { 'Content-Type': 'multipart/form-data' }, withCredentials: true }
+      );
+      toast.success(response.data.message);
+    } catch (error) {
+      console.error("Error updating user data:", error);
+      toast.error(error.response?.data?.message || "An error occurred");
+    }
+  
     toggleModal(); // Close the modal after form submission
   };
+  
+  
 
   return (
     <>
@@ -40,7 +100,7 @@ const EditProfile = () => {
           id="crud-modal"
           tabIndex="-1"
           aria-hidden="true"
-          className="fixed inset-0 z-50 flex justify-center items-center w-full h-screen bg-black bg-opacity-50 "
+          className="fixed inset-0 z-50 flex justify-center items-center w-full h-screen bg-black bg-opacity-50"
         >
           <div className="relative p-2 w-full max-w-lg max-h-full overflow-auto">
             {/* Modal content */}
@@ -74,7 +134,7 @@ const EditProfile = () => {
                 </button>
               </div>
               {/* Modal body */}
-              <form className="p-4 md:px-5 pt-3 " onSubmit={handleSubmit}>
+              <form className="p-4 md:px-5 pt-3" onSubmit={handleSubmit}>
                 <div className="grid gap-4 mb-4 grid-cols-2">
                   <div className="col-span-2 sm:col-span-1">
                     <label
@@ -218,9 +278,9 @@ const EditProfile = () => {
                 </div>
                 <button
                   type="submit"
-                  className="text-white inline-flex items-center bg-blue-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                  className="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-primary-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                 >
-                  Update
+                  Save Changes
                 </button>
               </form>
             </div>

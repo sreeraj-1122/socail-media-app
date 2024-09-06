@@ -5,7 +5,7 @@ import verifyToken from './../middlewares/verifyToken.js';
 
 const postRouter=express.Router()
 
-postRouter.post('/create',verifyToken,upload.single('file'),createPost)
+postRouter.post('/create',verifyToken,upload.single('filePath'),createPost)
 postRouter.delete('/delete/:id',verifyToken,deletePost)
 postRouter.put('/edit/:id',verifyToken,upload.single('file'),editPost)
 postRouter.post('/',verifyToken,getPosts)

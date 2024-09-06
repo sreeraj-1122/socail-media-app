@@ -1,13 +1,16 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import person from "../../assets/images/person.jpg";
 import nature from "../../assets/images/nature.jpg";
 import { GoHeart } from "react-icons/go";
 import { FaRegComment } from "react-icons/fa";
 import { HiOutlineBookmark } from "react-icons/hi";
 import { IoSendSharp } from "react-icons/io5";
+import axios from "axios";
+import { baseUrl } from "../../baseUrl/baseUrl";
 
 const Post = () => {
   const [comments, setComments] = useState([]);
+  const [posts, setPosts] = useState([]);
   const [show, setShow] = useState(false);
   const [newComment, setNewComment] = useState("");
 
@@ -17,7 +20,22 @@ const Post = () => {
       setNewComment("");
     }
   };
-
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+  const fetchPosts = async () => {
+    try {
+      const response = await axios.get(
+        baseUrl + "/post/userpost",
+        {},
+        { withCredentials: true }
+      );
+      console.log(response.data);
+      setPosts(response.data);
+    } catch (error) {
+      console.error("Error fetching post data:", error);
+    }
+  };
   return (
     <div className="shadow-custom-dark dark:bg-custom-bg w-full p-4 rounded-lg mb-3">
       {/* Post Header */}

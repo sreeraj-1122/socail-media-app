@@ -8,7 +8,7 @@ const userRouter=express.Router()
 userRouter.post('/register',registerUser)
 userRouter.post('/login',loginUser)
 userRouter.post('/getuser/:id?',verifyToken,getUser)
-userRouter.put('/updateuser',verifyToken,upload.single('file'),updateUser)
+userRouter.put('/updateuser',verifyToken,upload.single('profile'),updateUser)
 
 //friend requiest 
 userRouter.post('/friendrequest',verifyToken,friendRequest)

@@ -64,7 +64,7 @@ const registerUser = async (req, res, next) => {
             return res.status(400).json({ success: false, message: "Password must be at least 6 characters long" });
         }
 
-        
+
         // Create a new user
         const newUser = new User({
             name,
@@ -140,7 +140,7 @@ const friendRequest = async (req, res, next) => {
             requestFrom: userId,
         });
 
-        res.status(201).json({ success: true, message: "Friend request sent successfully",data:newRes })
+        res.status(201).json({ success: true, message: "Friend request sent successfully", data: newRes })
 
 
     } catch (error) {
@@ -151,12 +151,12 @@ const friendRequest = async (req, res, next) => {
 
 const updateUser = async (req, res, next) => {
     try {
-        const { name, location, profession } = req.body;
-        const { id: userId } = req.user;;
+        const { name, location, profession, instagram, facebook, github } = req.body;
+        const { id: userId } = req.user;
 
-        // Check for missing fields
+        // Check for required fields (instagram, facebook, github are optional)
         if (!name || !location || !profession) {
-            return res.status(400).json({ success: false, message: "Please provide all fields: name, location, and profession" });
+            return res.status(400).json({ success: false, message: "Please provide all required fields" });
         }
 
         // Check if a profile image is uploaded
@@ -167,6 +167,9 @@ const updateUser = async (req, res, next) => {
             name,
             location,
             profession,
+            ...(instagram && { instagram }), // Add to update only if present
+            ...(facebook && { facebook }),
+            ...(github && { github })
         };
 
         if (profile) {
@@ -175,7 +178,7 @@ const updateUser = async (req, res, next) => {
 
         // Update user in the database
         const user = await User.findByIdAndUpdate(userId, updateUser, { new: true });
-       
+
         if (!user) {
             return res.status(404).json({ success: false, message: "User not found" });
         }
@@ -186,6 +189,7 @@ const updateUser = async (req, res, next) => {
         next(error);
     }
 };
+
 
 
 
@@ -264,24 +268,24 @@ const profileViews = async (req, res, next) => {
 
 const suggestedFriends = async (req, res, next) => {
     try {
-      const { id: userId } = req.user;
-  
-      // Construct query to find users the current user is not following
-      const suggestedFriends = await User.find({
-        _id: { $ne: userId },                // Exclude current user
-        following: { $nin: [userId] }         // Users not being followed by current user
-      })
-        .limit(15)
-        .select("name profile profession");
-  
-      // Send the response
-      res.status(200).json({ success: true, data: suggestedFriends });
-      
+        const { id: userId } = req.user;
+
+        // Construct query to find users the current user is not following
+        const suggestedFriends = await User.find({
+            _id: { $ne: userId },                // Exclude current user
+            following: { $nin: [userId] }         // Users not being followed by current user
+        })
+            .limit(15)
+            .select("name profile profession");
+
+        // Send the response
+        res.status(200).json({ success: true, data: suggestedFriends });
+
     } catch (error) {
-      next(error);
+        next(error);
     }
-  };
-  
+};
+
 
 
 export { loginUser, registerUser, getUser, updateUser, friendRequest, getFriendRequest, acceptRequest, profileViews, suggestedFriends }

@@ -3,63 +3,29 @@ import person from "../../assets/images/person.jpg";
 import { IoMdImages } from "react-icons/io";
 import { FaVideo } from "react-icons/fa";
 import { BiSolidFileGif } from "react-icons/bi";
-import axios from "axios";
-import { baseUrl } from "../../baseUrl/baseUrl";
-import { toast } from 'react-toastify';
+import { useStore } from "../../context/StoreContextProvider";
+import { profileUrl } from "../../baseUrl/baseUrl";
 
-const CreatePost = () => {
-  const fileInputRef = useRef(null);
-  const [formData, setFormData] = useState({
-    description: "",
-    file: null, // Updated state for file
-  });
-  const [fileType, setFileType] = useState(""); // Track the selected file type
+const CreatePost = ({
+  handleSpanClick,
+  handleSubmit,
+  formData,
+  setFormData,
+  fileInputRef,
+  fileType,
+  handleFileChange,
+}) => {
 
-  const handleSpanClick = (type) => {
-    setFileType(type);
-    fileInputRef.current.click(); // Trigger the hidden file input's click
-  };
-
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setFormData((prevState) => ({
-        ...prevState,
-        file: file, // Save the selected file
-      }));
-    }
-  };
-  
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    const data = new FormData();
-    data.append('description', formData.description);
-    if (formData.file) {
-      data.append('filePath', formData.file); // Use 'filePath' as the key here
-    }
-  
-    try {
-      const response = await axios.post(`${baseUrl}/post/create`, data, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-        withCredentials: true,
-      });
-      console.log(response.data);
-      toast.success(response.data.message);
-      
-    } catch (error) {
-      console.error("Error creating post:", error);
-      
-    }
-  };
-
+  const {  profileId } = useStore();
+  const profileImageUrl = profileId?.profile
+  ? `${profileUrl}/${profileId.profile.replace(/\\/g, "/")}`
+  : person;
   return (
     <div className="shadow-custom-dark dark:bg-custom-bg w-full p-4 rounded-lg mb-3">
       <form onSubmit={handleSubmit}>
         <div className="flex mb-5 gap-2 items-center">
-          <img src={person} alt="Profile" className="w-10 h-10 rounded-full" />
+          <img src={profileImageUrl}
+           alt="Profile" className="w-10 h-10 rounded-full" />
           <input
             type="text"
             name="description"
@@ -78,10 +44,13 @@ const CreatePost = () => {
             ref={fileInputRef}
             style={{ display: "none" }} // Hide the actual file input
             accept={
-              fileType === "image" ? "image/*" :
-              fileType === "video" ? "video/*" :
-              fileType === "gif" ? "image/gif" :
-              "*/*" // Default to all file types
+              fileType === "image"
+                ? "image/*"
+                : fileType === "video"
+                ? "video/*"
+                : fileType === "gif"
+                ? "image/gif"
+                : "*/*" // Default to all file types
             }
             onChange={handleFileChange}
           />

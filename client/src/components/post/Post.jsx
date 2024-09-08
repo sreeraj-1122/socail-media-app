@@ -6,17 +6,21 @@ import { HiOutlineBookmark } from "react-icons/hi";
 import { IoSendSharp } from "react-icons/io5";
 import useDateFormatter from "../../hooks/useDateFormatter";
 import { profileUrl } from "../../baseUrl/baseUrl";
+import { useStore } from "../../context/StoreContextProvider";
 
 const Post = ({
   posts,
   handleAddComment,
-  comments ,
+  comments,
   newComment,
   setNewComment,
+  id,
+  setId,
+  activePostId,
+  setActivePostId,
 }) => {
   const { formatRelativeTime } = useDateFormatter();
-  const [activePostId, setActivePostId] = useState(null); // Track the active post
-
+  const { profileId } = useStore();
   return (
     <>
       {posts &&
@@ -32,25 +36,30 @@ const Post = ({
                   src={`${profileUrl}/${post.userId.profile}`}
                   alt="Profile"
                   className="w-10 h-10 rounded-full cursor-pointer"
+                  onClick={() => setId(post.userId?._id)}
                 />
               ) : (
                 <img
                   src={person} // Fallback image if userId or profile is null
                   alt="Profile"
                   className="w-10 h-10 rounded-full cursor-pointer"
+                  onClick={() => setId(post.userId?._id)}
                 />
               )}
               <div className="flex-grow">
                 <div className="flex justify-between">
-                  <h1 className="text-[14px] font-[500] opacity-95 cursor-pointer">
+                  <h1
+                    className="text-[14px] font-[500] opacity-95 cursor-pointer"
+                    onClick={() => setId(post.userId?._id)}
+                  >
                     {post.userId ? post.userId.name : "Unknown User"}
                   </h1>
                   <h2 className="text-[12px] font-[400] opacity-75">
                     {formatRelativeTime(post.createdAt)}
                   </h2>
                 </div>
-                <p className="text-[12px] text-gray-600 dark:text-gray-300 opacity-9 cursor-pointer">
-                  {post.userId && post.userId.location ||'No location'}
+                <p className="text-[12px] text-gray-600 dark:text-gray-300 opacity-9 ">
+                  {(post.userId && post.userId.location) || "Unknown location"}
                 </p>
               </div>
             </div>
@@ -93,12 +102,19 @@ const Post = ({
                 <div className="mt-4">
                   {/* Existing Comments */}
                   <div className="mb-4">
-                    {comments[post._id]?.map((comment, index) => (
-                      <div key={index} className="flex items-start gap-2 mb-2 w-full justify-between">
-                        <img src={person} alt="Commenter Profile" className="w-8 h-8 rounded-full cursor-pointer" />
+                    {comments?.map((comment, index) => (
+                      <div
+                        key={index}
+                        className="flex items-start gap-2 mb-2 w-full justify-between"
+                      >
+                        <img
+                          src={person}
+                          alt="Commenter Profile"
+                          className="w-8 h-8 rounded-full cursor-pointer"
+                        />
                         <div className="p-2 rounded-lg flex-grow">
-                          <h1 className="text-sm font-semibold">Commenter</h1>
-                          <p className="text-sm">{comment}</p>
+                          <h1 className="text-sm font-semibold">{comment?.from}</h1>
+                          <p className="text-sm">{comment?.comment}</p>
                           <p className="text-xs mt-2 cursor-pointer">Reply</p>
                         </div>
                         <div className="mr-2">
@@ -115,17 +131,14 @@ const Post = ({
                       type="text"
                       className="flex-grow border-b p-2 dark:bg-[#2c2c2c] dark:text-white outline-none"
                       placeholder="Add a comment..."
-                      value={newComment[post._id] || ""}
+                      value={newComment}
                       onChange={(e) =>
-                        setNewComment((prevComments) => ({
-                          ...prevComments,
-                          [post._id]: e.target.value,
-                        }))
+                        setNewComment( e.target.value)
                       }
                     />
                     <IoSendSharp
                       className="text-lg mr-3 cursor-pointer"
-                      onClick={() => handleAddComment(post._id)}
+                      onClick={() => handleAddComment(post._id,profileId.name)}
                     />
                   </div>
                 </div>

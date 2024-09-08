@@ -166,27 +166,28 @@ const getPosts = async (req, res, next) => {
 };
 
 const getUserPost = async (req, res, next) => {
-
   try {
-    const { id: userId } = req.user;
+    const { id } = req.body;
+    const posts = await Posts.find({ userId: id })
+      .populate({
+        path: "userId",
+        select: "name location profile",
+      })
+      .sort({ _id: -1 }); // Sorting to get latest posts first
 
-    const post = await Posts.find({ userId }).populate({
-      path: "userId",
-      select: "name location profile "
-    }).sort({ _id: -1 })
-
-
+    // Respond with posts if found
     res.status(200).json({
       success: true,
-      message: "Successful",
-      data: post
-
-    })
+      message: "Posts fetched successfully",
+      data: posts,
+    });
   } catch (error) {
-    next(error);
+    // Log error and pass it to the next middleware
+    console.error("Error fetching user posts:", error);
+    next(error); // Pass error to the error-handling middleware
   }
+};
 
-}
 
 //get coments
 const getComments = async (req, res, next) => {
@@ -360,7 +361,7 @@ const replyPostComment = async (req, res, next) => {
     res.status(200).json({ success: true, data: commentInfo });
   } catch (error) {
     next(error);
-  }
+  } 
 };
 
 //commnetpost

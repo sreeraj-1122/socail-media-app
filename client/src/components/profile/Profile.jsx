@@ -9,8 +9,9 @@ import Post from "./../post/Post";
 import { baseUrl, profileUrl } from "./../../baseUrl/baseUrl";
 import axios from "axios";
 import useDateFormatter from "../../hooks/useDateFormatter.js";
+import { IoArrowBackCircleOutline } from "react-icons/io5";
 
-const Profile = () => {
+const Profile = ({ id, setId }) => {
   const { isOpen, setIsOpen, profileId, setProfileId } = useStore();
   const [profile, setProfile] = useState(null);
   const { formatRelativeTime } = useDateFormatter(); // Use the custom hook
@@ -19,19 +20,24 @@ const Profile = () => {
     const fetchUserData = async () => {
       try {
         const response = await axios.post(
-          baseUrl + "/user/getuser",
+          `${baseUrl}/user/getuser${id ? `/${id}` : ""}`,
           {},
           { withCredentials: true }
         );
+
         setProfile(response.data.data);
-        setProfileId(response.data.data); // Update profileId in context
+
+        // Only update profileId if id is not provided
+        if (!id) {
+          setProfileId(response.data.data); // Update profileId in context only when no id is passed
+        }
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
     };
 
     fetchUserData();
-  }, [isOpen]);
+  }, [isOpen, id]);
 
   const handleEditClick = () => {
     setIsOpen(true);
@@ -53,18 +59,22 @@ const Profile = () => {
         </div>
         <div className="md:flex-grow text-center md:text-left">
           <h1 className="md:text-lg font-semibold text-3xl">
-            {profile?.name || "Sreeraj"}
+            {profile?.name || "Unknown User"}
           </h1>
           <p className="text-sm text-gray-600 dark:text-gray-300 opacity-80">
             {profile?.profession || "No profession"}
           </p>
         </div>
-        <button
-          aria-label="Edit Profile"
-          onClick={handleEditClick}
-        >
-          <FaEdit className="text-gray-400 hover:text-blue-500 text-2xl md:text-xl" />
-        </button>
+
+        {!id ? (
+          <button aria-label="Edit Profile" onClick={handleEditClick}>
+            <FaEdit className="text-gray-400 hover:text-blue-500 text-2xl md:text-xl" />
+          </button>
+        ) : (
+          <button aria-label="Edit Profile" onClick={() => setId(null)}>
+            <IoArrowBackCircleOutline className="text-gray-400 hover:text-blue-500 text-3xl md:text-xl" />
+          </button>
+        )}
       </section>
 
       <hr className="my-4" />
